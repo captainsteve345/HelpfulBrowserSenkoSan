@@ -1,14 +1,11 @@
-let webview = document.createElement("webview");
+let webview = document.getElementById("webview");
+
 
 let webviewConfig = {
     "home":"https://www.google.co.uk",
-    "size":"position: absolute; width: 99%; height: 97%;"
 };
 
-webview.src = webviewConfig["home"];
-webview.style = webviewConfig["size"];
-
-let searchBar = document.createElement("input");
+let searchBar = document.getElementById("searchBar");
 
 function goHome() {
     webview.src = webviewConfig["home"];
@@ -17,34 +14,28 @@ function goHome() {
 
 function goLink(link) {
     webview.src = link;
-    searchBar.value = "";
+    searchBar.value = webview.src;
 }
 
 
-let homeBtn = document.createElement("button");
-let redditBtn = document.createElement("button");
-let chanBtn = document.createElement("button");
-let funBtn = document.createElement ("button");
+let homeBtn = document.getElementById("homeBtn");
+let backBtn = document.getElementById("backBtn");
+let reloadBtn = document.getElementById("reloadBtn");
+let forwardBtn = document.getElementById("forwardBtn");
 homeBtn.onclick=function(){goHome()};
-redditBtn.onclick=function(){goLink("https://www.reddit.com")};
-chanBtn.onclick=function(){goLink("https://www.4chan.org")};
-funBtn.onclick=function() {goLink ("https://theuselessweb.com/"_};
-homeBtn.innerHTML = "Home";
-redditBtn.innerHTML = "Reddit";
-chanBtn.innerHTML = "4Chan";
-funBtn.innerHTML = "Simon's Magic Uncle";
-
-searchBar.type="text";
-searchBar.placeholder="Type a url";
+backBtn.onclick=function(){webview.back()};
+forwardBtn.onclick=function(){webview.forward();};
+reloadBtn.onclick=function(){webview.reload();};
 
 // START SEARCH FUNCTIONALITY
 
 function liberalLinks(link) {
-    let start = "https://";
-    let startw = "www.";
+    const start = "https://";
+    const startw = "www.";
     let linkSt = "";
     let linkStw = "";
-    
+    const searchEngine = "https://www.google.com/search?q=";
+
     for (let i=0; i < 8; i++) {
         linkSt += link[i];
     }
@@ -57,27 +48,31 @@ function liberalLinks(link) {
         if (startw === linkStw) {
             return start + startw + link;
         }
-        return start + link;
-        
+        if (link.includes('.') === true) {
+            return start + link;
+        }else{
+            return searchEngine + link;
+        }
+            
     }else{
-        return link;   
+            return link;
     }
 }
 
-function search(link) {
-    goLink(liberalLinks(link));
-    searchBar.value = "";
+function search() {
+    
 }
 
-let searchBtn = document.createElement("button");
-searchBtn.onclick=function(){search(searchBar.value)};
-searchBtn.innerHTML = "Search";
+searchBar.addEventListener("keyup", function() {
+    let key = event.which;
+    if (key === 13){
+        goLink(liberalLinks(searchBar.value));
+    }
+});
+webview.addEventListener("loadstop",function() {
+    if (searchBar.value !== webview.src) {
+        searchBar.value = webview.src;
+    }
+});
 
 // END SEARCH FUNCTIONALITY
-
-let spaceBr = document.createElement("br");
-
-const elements = [homeBtn, redditBtn, chanBtn, searchBar, searchBtn, spaceBr, webview];
-for (let i=0; i < elements.length; i++) {
-    document.body.appendChild(elements[i]);
-}
